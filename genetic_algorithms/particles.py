@@ -7,13 +7,13 @@ import math
 import time
 
 particles_amount = 50
-dim = 3
+dim = 4
 w = 0.729
 c1 = 1.49445
 c2 = 1.49445
 b_lo = -5.12
 b_up = 5.12
-iterations = 200
+iterations = 500
 
 # -----> rastrigin function
 def f(X):

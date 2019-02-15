@@ -5,6 +5,7 @@
 import java.io.*; 
 import java.util.*;
 import java.util.regex.Pattern;
+import java.math.*;
 
 class Wordprocessing
 {
@@ -19,7 +20,7 @@ class Wordprocessing
 
 	public static void print_words()
 	{ 
-		File file = new File("file.txt");
+		File file = new File("file1.txt");
     	try
 		{
         	Scanner sc = new Scanner(file);
@@ -29,15 +30,25 @@ class Wordprocessing
 			while (sc.hasNext())
 			{
 				String word = sc.next();
-				int cur_letters =  different_letters(word);
-				if (cur_letters > max_letters)
+				ArrayList<String> words = new ArrayList<String>();
+				words.add(word.substring(0, Math.min(30, word.length())));
+				while (word.length() > 30)
 				{
-					max_letters = cur_letters;
-					longest_words.clear();
-					longest_words.add(word);
+					words.add(word.substring(30, Math.min(30, word.length())));
+					word = word.substring(30);
 				}
-				else if (cur_letters == max_letters)
-					longest_words.add(word);
+				for (int j = 0; j < words.size(); j++)
+				{
+					int cur_letters =  different_letters(words.get(j));
+					if (cur_letters > max_letters)
+					{
+						max_letters = cur_letters;
+						longest_words.clear();
+						longest_words.add(words.get(j));
+					}
+					else if (cur_letters == max_letters)
+						longest_words.add(words.get(j));
+				}
 			}
 			System.out.println("Max number of different letters: " + max_letters);
 			int size = longest_words.size();
