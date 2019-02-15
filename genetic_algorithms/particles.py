@@ -4,9 +4,10 @@ from random import random, randint, seed, Random
 import numpy
 from copy import copy
 import math
+import time
 
-particles_amount = 20
-dim = 2
+particles_amount = 50
+dim = 3
 w = 0.729
 c1 = 1.49445
 c2 = 1.49445
@@ -14,16 +15,36 @@ b_lo = -5.12
 b_up = 5.12
 iterations = 200
 
-def criteria(particles):
-    return True
-
+# -----> rastrigin function
 def f(X):
-    # rastrigin function
     n = len(X)
-    r = 0
+    res = 0
     for i in range(n):
-        r += X[i] * X[i] - 10 * math.cos(2 * math.pi * X[i]) + 10
-    return r
+        res += X[i] * X[i] - 10 * math.cos(2 * math.pi * X[i]) + 10
+    return res
+
+# -----> sphere function
+# def f(X):
+#     n = len(X)
+#     r = 0
+#     for i in range(n):
+#         r += X[i] * X[i]
+#     return r
+
+# -----> rosenbroke function
+# def f(X):
+#     n = len(X)
+#     r = 0
+#     for i in range(n-1):
+#         r += 100 * (X[i+1] - X[i]*X[i])**2 + (X[i] - 1)**2
+#     return r
+
+# -----> ekli function
+# def f(X):
+#     res = -20 * math.exp(-0.2 * math.sqrt(X[0]**2 + X[1]**2)) - \
+#         math.exp(0.5 * ( math.cos(2*math.pi*X[0]) + math.cos(2*math.pi*X[1]) ) ) + \
+#             math.e + 20
+#     return res
 
 class Particle():
     def __init__(self, my_seed):
@@ -37,7 +58,6 @@ class Particle():
         self.my_best_pos = copy(self.position)
 
 
-
 def particle_optimization():
     rndm = Random(0)
     swarm = [Particle(i) for i in range(particles_amount)]  
@@ -46,6 +66,7 @@ def particle_optimization():
         if f(swarm[i].position) < f(gbest):
             gbest = copy(swarm[i].position)
 
+    t1 = time.time()
     for epoch in range(0, iterations):
         if epoch % 20 == 0:
             print("Fitness function value: " + str(f(gbest)))
@@ -64,15 +85,20 @@ def particle_optimization():
                 elif swarm[i].position[d] > b_up:
                     swarm[i].position[d] = b_up
             if f(swarm[i].position) < f(swarm[i].my_best_pos):
-                print("better----> " + str(swarm[i].position))
+                print("new best position----> " + str(swarm[i].position))
                 swarm[i].my_best_pos = copy(swarm[i].position)
                 if f(swarm[i].my_best_pos) < f(gbest):
                     gbest = copy(swarm[i].my_best_pos)
                     print("New global best pos: " + str(gbest))
+    print("\033[1;32m Time: \033[0;0m" + str(time.time() - t1))
     return gbest
 
+
+n_round = 2
 if __name__ == "__main__":
     print("Particle swarm optimization")
     res = particle_optimization()
-    print("Result: " + str(res))
-    print("Fitness in " + str(res) + " = " + str(f(res)) )
+    # for i in range(dim):
+    #     res[i] = round(res[i], n_round)
+    print("\033[1;32m Result:  \033[0;0m" + str(res))
+    print("\033[1;32m Fitness in  \033[0;0m" + str(res) + " = " + str(f(res)) )
