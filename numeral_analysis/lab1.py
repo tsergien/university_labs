@@ -1,6 +1,5 @@
 #!/usr/bin/python3
 
-import matplotlib
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy import integrate
@@ -70,13 +69,14 @@ def polinomial():
 
 
 def trigonometric():
-    a0, b0, fr = -pi, pi, rescale_function(a, b, f, -pi, pi)
+    a0, b0, f_resc = -pi, pi, rescale_function(a, b, f, -pi, pi)
     def phi(i: int, x: float) -> float:
         return (np.sin if (i & 1) else np.cos)(((i + 1) >> 1) * x)
-    f_sol = root_mean_square_approximation(a0, b0, phi, fr)
+    f_sol = root_mean_square_approximation(a0, b0, phi, f_resc)
     print(f'Trigonometric approximation error = '
-        f'{integrate.quad(lambda x: (f_sol(x) - fr(x))**2, a0, b0)[0]}')
-    x = np.linspace(a0, b0, 100)
+        f'{integrate.quad(lambda x: (f_sol(x) - f_resc(x))**2, a0, b0)[0]}')
+    x = np.linspace(a, b, 100)
+    f_sol = rescale_function(-pi, pi, f_sol, a, b)
     graph(x, f, f_sol, "Trigonometric approximation")
 
 
@@ -86,12 +86,15 @@ def scalar_product_discrete(f1: Callable[[float], float], f2: Callable[[float], 
     x: List[float]) -> float:
     return np.dot(list(map(f1, x)), list(map(f2, x))) / len(x)
 
-def root_mean_square_approximation_polinomial_discrete(n: int, m: int, a0: float, 
+def root_mean_square_approximation_polinomial_discrete(n_dots: int, m: int, a0: float, 
     b0: float) -> None:
-    x = np.linspace(a0, b0, n + 1)
+    x = np.linspace(a0, b0, n_dots + 1)
     
-    cost = [np.inf for _ in range(10)]
+    # cost = [np.inf for _ in range(10)]
+    cost = np.inf
+    cost_prev = np.unf
     for n in range(1, 10):
+    while cost
         b = np.array([
             scalar_product_discrete(f, lambda x: x**i, x)
         for i in range(n + 1)])
@@ -116,7 +119,7 @@ def root_mean_square_approximation_polinomial_discrete(n: int, m: int, a0: float
         def diff(x): 
             return f(x) - f_sol(x)
 
-        cost[n] = scalar_product_discrete(diff, diff, x) / (m - n)
+        cost[n] = scalar_product_discrete(diff, diff, x) / (n_dots - m)
 
         print(f'n = {n}, cost = {cost[n]}')
 
@@ -209,6 +212,6 @@ n = 5
 polinomial()
 trigonometric()
 n_disc, m = 12, 5
-# root_mean_square_approximation_polinomial_discrete(n_disc, m, a, b)
+root_mean_square_approximation_polinomial_discrete(n_disc, m, a, b)
 n_spl = 10
 # spline_interpolation(n_spl, a, b, f)
