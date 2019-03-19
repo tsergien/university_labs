@@ -20,8 +20,8 @@ def rescale_function(old_a: float, old_b: float, f: Callable[[float], float],
     return lambda x: f((old_b - old_a) / (new_b - new_a) * (x - new_a) + old_a)
 
 def graph(x, f: Callable[[float], float], f_sol: Callable[[float], float], name: str):
-    plt.plot(x, f_sol(x), 'k-', label='Approximation function')
     plt.plot(x, f(x), 'b-', label='True function')
+    plt.plot(x, f_sol(x), 'k-', label='Approximation function')
     plt.xlabel('x')
     plt.ylabel('y')
     plt.title(name)
@@ -69,15 +69,16 @@ def polinomial():
 
 
 def trigonometric():
-    a0, b0, f_resc = -pi, pi, rescale_function(a, b, f, -pi, pi)
+    a0, b0, f_resc = 0, 2*pi, rescale_function(a, b, f, 0, 2*pi)
     def phi(i: int, x: float) -> float:
-        return (np.sin if (i & 1) else np.cos)(((i + 1) >> 1) * x)
+        return (np.sin if (i & 1) else np.cos)(((i + 1) >> 1) * x) / np.sqrt(pi)
     f_sol = root_mean_square_approximation(a0, b0, phi, f_resc)
-    print(f'Trigonometric approximation error = '
-        f'{integrate.quad(lambda x: (f_sol(x) - f_resc(x))**2, a0, b0)[0]}')
     x = np.linspace(a, b, 100)
-    f_sol = rescale_function(-pi, pi, f_sol, a, b)
+    f_sol = rescale_function(0, 2*pi, f_sol, a, b)
+    print(f'Trigonometric approximation error = '
+        f'{integrate.quad(lambda x: (f_sol(x) - f(x))**2, a, b)[0]}')
     graph(x, f, f_sol, "Trigonometric approximation")
+
 
 
 ####################################################################
@@ -90,62 +91,50 @@ def root_mean_square_approximation_polinomial_discrete(n_dots: int, m: int, a0: 
     b0: float) -> None:
     x = np.linspace(a0, b0, n_dots + 1)
     
-    # cost = [np.inf for _ in range(10)]
-    cost = np.inf
-    cost_prev = np.unf
-    for n in range(1, 10):
-    while cost
+    cost = [np.inf for _ in range(10)]
+    for l in range(1, 10): #while
+        def phi(i: int, x: float):
+            return x**i
+
         b = np.array([
             scalar_product_discrete(f, lambda x: x**i, x)
-        for i in range(n + 1)])
+            for i in range(n_dots + 1)])
 
         a = np.array([[
             scalar_product_discrete( 
                 lambda x: x**j, 
                 lambda x: x**i,
-                x) for j in range(n + 1)
-        ] for i in range(n + 1)])
+                x) for j in range(n_dots + 1)
+            ] for i in range(n_dots + 1)])
 
         c = np.linalg.solve(a, b)
 
         def f_sol(x):
-            s = 0
-            x_pow = 1
-            for k in range(n + 1):
-                s += c[k] * x_pow
-                x_pow *= x
-            return s
+            return np.dot(c, np.array([phi(k, x) for k in range(n_dots + 1)]))
 
         def diff(x): 
             return f(x) - f_sol(x)
 
-        cost[n] = scalar_product_discrete(diff, diff, x) / (n_dots - m)
+        cost[l] = scalar_product_discrete(diff, diff, x) / (n_dots - m)
 
-        print(f'n = {n}, cost = {cost[n]}')
+        print(f'n = {l}, cost = {cost[l]}')
 
-    # true value of n
-    n = 2  # cost.index(min(cost))
 
     b = np.array([
         scalar_product_discrete(f, lambda x: x**i, x)
-    for i in range(n + 1)])
+        for i in range(n_dots + 1)])
 
     a = np.array([[
         scalar_product_discrete(
             lambda x: x**j, 
             lambda x: x**i, 
-            x) for j in range(n + 1)
-    ] for i in range(n + 1)])
+            x) for j in range(n_dots + 1)
+    ] for i in range(n_dots + 1)])
 
     c = np.linalg.solve(a, b)
 
     def f_sol(x):
-        s = 0
-        x_pow = 1
-        for k in range(n + 1):
-            s += c[k] * x_pow
-            x_pow *= x
-        return s
+        return np.dot(c, np.array([phi(k, x) for k in range(n_dots + 1)]))
 
     def diff(x):
         return f(x) - f_sol(x)
@@ -209,8 +198,8 @@ def spline_interpolation(n: int, a0: float, b0: float,
 
 
 n = 5
-polinomial()
-trigonometric()
+# polinomial()
+# trigonometric()
 n_disc, m = 12, 5
 root_mean_square_approximation_polinomial_discrete(n_disc, m, a, b)
 n_spl = 10
