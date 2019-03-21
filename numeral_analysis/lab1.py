@@ -97,23 +97,23 @@ def root_mean_square_approximation_polinomial_discrete(n_dots: int, m: int, a0: 
     def phi(i: int, x: float):
         return x**i
     m = 0
-    while (sigm < sigm_prev and abs(sigm - sigm_prev) > 10**-12):
+    while (sigm < sigm_prev or abs(sigm - sigm_prev) > 10**-3) and m < n_dots -1:
         m += 1
         b = np.array([
             scalar_product_discrete(f, lambda x: x**i, x)
-            for i in range(n_dots + 1)])
-# numpy.linalg.lstsq
+            for i in range(m + 1)])
+
         a = np.array([[
             scalar_product_discrete( 
                 lambda x: x**j, 
                 lambda x: x**i,
                 x) for j in range(m + 1)
-            ] for i in range(n_dots + 1)])
+            ] for i in range(m + 1)])
 
         c = np.linalg.solve(a, b)
 
         def f_sol(x):
-            return np.dot(c, np.array([phi(k, x) for k in range(n_dots + 1)]))
+            return np.dot(c, np.array([phi(k, x) for k in range(m + 1)]))
 
         def diff(x): 
             return f(x) - f_sol(x)
@@ -122,23 +122,24 @@ def root_mean_square_approximation_polinomial_discrete(n_dots: int, m: int, a0: 
         sigm = scalar_product_discrete(diff, diff, x) / (n_dots - m)
 
         print(f'Power of P_m: m = {m}, sigma = {sigm}')
-
+        
+    m = 6 
 
     b = np.array([
         scalar_product_discrete(f, lambda x: x**i, x)
-        for i in range(n_dots + 1)])
+        for i in range(m + 1)])
 
     a = np.array([[
         scalar_product_discrete(
             lambda x: x**j, 
             lambda x: x**i, 
-            x) for j in range(n_dots + 1)
-    ] for i in range(n_dots + 1)])
+            x) for j in range(m + 1)
+    ] for i in range(m + 1)])
 
     c = np.linalg.solve(a, b)
 
     def f_sol(x):
-        return np.dot(c, np.array([phi(k, x) for k in range(n_dots + 1)]))
+        return np.dot(c, np.array([phi(k, x) for k in range(m + 1)]))
 
     def diff(x):
         return f(x) - f_sol(x)
@@ -202,9 +203,9 @@ def spline_interpolation(n: int, a0: float, b0: float,
 
 
 n = 5
-# polinomial()
-# trigonometric()
+polinomial()
+trigonometric()
 n, m = 12, 5
 root_mean_square_approximation_polinomial_discrete(n, m, a, b)
 n_spl = 10
-# spline_interpolation(n_spl, a, b, f)
+spline_interpolation(n_spl, a, b, f)
