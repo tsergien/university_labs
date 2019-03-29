@@ -6,11 +6,13 @@ from scipy import integrate
 from math import pi
 from typing import Callable, List
 
-a, b = 0, 5
+a, b = 0, 2*pi
 A, B, w = 1, 1, 2
 
 def f(x: float) -> float:
-    return A * np.sin(w * x) + B * x
+    return np.sin(w * x) + x**2 - 2*pi*x
+    # return x* (x - 2 * pi) * pi
+ 
 
 def scalar_prod(f1: Callable[[float], float], f2: Callable[[float], float], lower: float, higher: float) -> float:
     return integrate.quad(lambda x: f1(x) * f2(x), lower, higher)[0]
@@ -25,7 +27,7 @@ def graph(x, f: Callable[[float], float], f_sol: Callable[[float], float], name:
     plt.xlabel('x')
     plt.ylabel('y')
     plt.title(name)
-    plt.ylim((-0.5, 5.5))
+    # plt.ylim((, 0))
     plt.legend()
     plt.grid(True)
     plt.show()
@@ -68,14 +70,23 @@ def polinomial():
     graph(x, f, f_sol, "Polinomial approximation")
 
 
-def trigonometric():
+def trigonometric(n: int):
     a0, b0, f_resc = 0, 2*pi, rescale_function(a, b, f, 0, 2*pi)
     def phi(i: int, x: float) -> float:
-        return (np.sin if (i & 1) else np.cos)(((i + 1) >> 1) * x) / np.sqrt(pi)
-    f_sol = root_mean_square_approximation(a0, b0, phi, f_resc)
+        return (np.sin if (i & 1) else np.cos)(((i + 1) >> 1) * x)
+    
+    c = []
+    c.append( scalar_prod(f_resc, lambda x: 1, a0, b0) / 2 / pi )
+    for k in range(1, n):
+        c.append( scalar_prod(f_resc, lambda x: phi(k, x), a0, b0) / pi )
+
+    def f_sol(x):
+        return np.dot(c, np.array([phi(k, x) for k in range(n)]))
+   
     x = np.linspace(a, b, 100)
-    f_sol = rescale_function(0, 2*pi, f_sol, a, b)
-    print(f'Trigonometric approximation error = '
+    f_sol = rescale_function(a0, b0, f_sol, a, b)
+
+    print(f'Trigonometric approximation error ([0;5]) = '
         f'{integrate.quad(lambda x: (f_sol(x) - f(x))**2, a, b)[0]}')
     graph(x, f, f_sol, "Trigonometric approximation")
 
@@ -141,8 +152,6 @@ def root_mean_square_approximation_polinomial_discrete(n_dots: int, m: int, a0: 
     def f_sol(x):
         return np.dot(c, np.array([phi(k, x) for k in range(m + 1)]))
 
-    def diff(x):
-        return f(x) - f_sol(x)
 
     x = np.linspace(a0, b0, 100)
     graph(x, f, f_sol, "Discrete approximation")
@@ -155,7 +164,8 @@ def spline_interpolation(n: int, a0: float, b0: float,
     x = np.linspace(a0, b0, n + 1)
     h = x[1:] - x[:-1]
 
-    R = np.eye(n + 1)
+    ro = 0.05
+    R = np.eye(n + 1) * ro
 
     H = np.zeros((n + 1, n + 1))
 
@@ -176,9 +186,9 @@ def spline_interpolation(n: int, a0: float, b0: float,
             a[i, i + 1] = h[i] / 6
             b[i] = (f(x[i + 1]) - f(x[i])) / h[i] - (f(x[i]) - f(x[i - 1])) / h[i - 1]
 
-    m = np.linalg.solve(a + np.dot(H, H.T), b)
+    m = np.linalg.solve(a + np.dot(np.dot(H, R), H.T), b)
 
-    f_u = f(x) - np.dot(H.T, m).T
+    f_u = f(x) - np.dot(np.dot(R, H.T), m).T
 
     def f_sol(x0: float) -> float:
         for i in range(n):
@@ -190,6 +200,8 @@ def spline_interpolation(n: int, a0: float, b0: float,
 
     x1 = np.linspace(a0, b0, 100 + 1)
     y = [f_sol(xi) for xi in x1]
+    print(f'Spline aproximation error  = '
+         f'{integrate.quad(lambda x: (f_sol(x) - f(x))**2, 0, 5)[0]}')
 
     plt.plot(x1, y, 'k-', label='Approximation function')
     plt.plot(x1, f(x1), 'b-', label='True function')
@@ -202,10 +214,13 @@ def spline_interpolation(n: int, a0: float, b0: float,
     plt.show()
 
 
-n = 5
-polinomial()
-trigonometric()
+n = 20
+# polinomial()
+trigonometric(10)
+trigonometric(15)
+trigonometric(31)
+
 n, m = 12, 5
-root_mean_square_approximation_polinomial_discrete(n, m, a, b)
-n_spl = 10
-spline_interpolation(n_spl, a, b, f)
+# root_mean_square_approximation_polinomial_discrete(n, m, a, b)
+n_spl = 50
+# spline_interpolation(n_spl, a, b, f)
