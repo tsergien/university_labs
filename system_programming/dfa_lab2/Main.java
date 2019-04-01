@@ -9,7 +9,7 @@ public class Main{
     public static void main(String[] args)
     {
         Scanner sc = new Scanner(System.in);
-        // System.out.format("Please enter the name of file with NFA: ");
+        // System.out.format("Please enter the name of file with FSM: ");
         // String pathname = sc.next();
 
         String pathname = "automat1";
@@ -17,7 +17,7 @@ public class Main{
         FSM fsm = new FSM(file);
 
         Set<Integer> reachableStates = fsm.getReachable();
-        System.out.println("reachable");
+        System.out.println("Reachable states: ");
         for (Integer st: reachableStates){
             System.out.println(st);
         }
@@ -30,15 +30,15 @@ public class Main{
             System.out.println(st);
         }
         Set<Integer> reachableFromAfterW0 = fsm.getReachableFromStates(afterW0);
-        System.out.println("reachable after fromw0");
+        System.out.println("Reachable after fromw0");
         for (Integer st: reachableFromAfterW0){
             System.out.println(st);
         }
         reachableFromAfterW0.retainAll(fsm.finals);
         if (reachableFromAfterW0.isEmpty()) {
-            System.out.println("There does NOT exist w1, w2 such that w1w0w2 is acceptable.");
+            System.out.println("-----> There does NOT exist w1, w2 such that w1w0w2 is acceptable.");
         } else {
-            System.out.println("There DOES exist w1, w2 such that w1w0w2 is acceptable.");
+            System.out.println("-----> There DOES exist w1, w2 such that w1w0w2 is acceptable.");
         }
         sc.close();      
 

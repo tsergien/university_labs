@@ -119,15 +119,18 @@ public class FSM {
     Set<Integer> processWordFromStates(String word, Set<Integer> fromStates) {
         Set<Integer> states_ = new HashSet<>(fromStates);
         for (Character viaLetter : word.toCharArray()) {
+            System.out.println("viaLetter: " + viaLetter);
             Set<Integer> nextStates = new HashSet<>();
+            for (Integer lett: states_) {
+                System.out.println("Cur states: " + lett);
+            }
             for (Integer fromState_ : states_) {
-                System.out.println("from: " + fromState_);
-                System.out.println(transitions.get(fromState_).get(viaLetter));
                 if (transitions.get(fromState_).containsKey(viaLetter)){
                     nextStates.addAll(transitions.get(fromState_).get(viaLetter));
                 }
             }
             states_ = new HashSet<>(nextStates);
+
         }
         return states_;
     }
