@@ -55,10 +55,20 @@ def BinDecParam(Xmin, Xmax, eps):
     b = CodBinary(1.5, 0, 1, 3)
     CodDecimal(b, 0, 3)
 
+def Parens(N: int):
+    random.seed(1234)
+    mlist = [random.randint(1, 2* N) for _ in range(N)]
+    flist = [random.randint(1, 2 * N) for _ in range(N)]
+    for i in range(N):
+        if mlist[i] == flist[i]:
+            mlist[i] = (mlist[i] + random.randint(1, 2*N)) % (N + 1)
+    return (mlist, flist)
+
 
 if __name__ == "__main__":
-    N = int(input("\033[1;33mPlease, enter N(rows):\033[0;0m "))
-    M = int(input("\033[1;33mPlease, enter M(columns):\033[0;0m "))
-    G = generationDec(N, M)
-
+    # N = int(input("\033[1;33mPlease, enter N(rows):\033[0;0m "))
+    # M = int(input("\033[1;33mPlease, enter M(columns):\033[0;0m "))
+    # G = generationDec(N, M)
+    N = 10
+    mlist, flist = Parens(N)
 
