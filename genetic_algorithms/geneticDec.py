@@ -3,6 +3,7 @@
 import math
 import numpy as np
 import random
+from scipy import reduce
 
 dd = []
 nn = []
@@ -25,22 +26,28 @@ def generationDec(N, M):
     BinDecParam(Xmin, Xmax, 0.001)
     return G
 
-def CodBinary(xdec, xmin, l, d):
-    print("initial xdec: ", xdec)
-    Xbin = [] ############ fill later
-    xx = (xdec - xmin) // d
-    xx = bin(xx)
-    if len(xx) < l:
-        xx += "0" * (l - len(xx))
-    print("xx: " , xx[2:])
-    return xx[2:]
+def CodBinary(xdec: float, xmin: float, l: int, d: float) -> np.array:
+    """
+    :param x_dec: dec num to encode
+    :param x_min: min num possible to encode
+    :param l: num of bin digits to return
+    :param d: discretionary of encoding to return
+    :return: encoded num as np.array of digits
+    """
+    xx = int(np.floor((xdec - xmin) / d))
+    digits = list(map(int, bin(xx)[:1:-1]))
+    return np.array(digits + [0 for _ in range(l - len(digits))])
 
-def CodDecimal(xbin, xmin, d):
-    xdec1 = int(xbin, 2)
-    xdec = xmin + d * xdec1
-    print("xdec1: ", xdec1)
-    print("xdec: ", xdec)
-    return xdec
+
+def CodDecimal(xbin: np.array, xmin: float, d: float):
+    """
+    :param x_bin: bin num to decode as np.array of digits
+    :param x_min: min num possible to encode
+    :param d: discretionary of encoded number
+    :return: decoded num as float
+    """
+    xdec1 = reduce(lambda _1, _2: _1 * 2 + _2, map(int, xbin[::-1]))
+    return xmin + d * xdec1
     
 def BinDecParam(Xmin, Xmax, eps):
     dim = len(Xmin)
@@ -75,5 +82,5 @@ if __name__ == "__main__":
     # G = generationDec(N, M)
     N = 10
     mlist, flist = Parens(N)
-    
+
 
