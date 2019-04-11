@@ -64,6 +64,10 @@ def Parens(N: int):
             mlist[i] = (mlist[i] + random.randint(1, 2*N)) % (N + 1)
     return (mlist, flist)
 
+def Adapt(periodic: list, N: int):
+    periodic_min = min(periodic)
+    periodic = [periodic[i] - periodic_min for i in range(len(periodic))]
+
 
 if __name__ == "__main__":
     # N = int(input("\033[1;33mPlease, enter N(rows):\033[0;0m "))
@@ -71,4 +75,5 @@ if __name__ == "__main__":
     # G = generationDec(N, M)
     N = 10
     mlist, flist = Parens(N)
+    
 
