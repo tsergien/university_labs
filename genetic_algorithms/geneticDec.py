@@ -3,28 +3,11 @@
 import math
 import numpy as np
 import random
-from scipy import reduce
+from functools import reduce
 
 dd = []
 nn = []
 NN = []
-
-def generationDec(N, M):
-    Xmin = []
-    Xmax = []
-    G = np.zeros( (N, M+1) )
-
-    for i in range(N):
-        for j in range(M):
-            Xmin.append(-5)
-            Xmax.append(5) 
-            G[i][j] = random.uniform(Xmin[j], Xmax[j])
-    print("\033[1;33m Matrix G: \033[0;0m")
-    print(G)
-    print("\033[1;33mXmin: \033[0;0m" + str(Xmin))
-    print("\033[1;33mXmax: \033[0;0m" + str(Xmax))
-    BinDecParam(Xmin, Xmax, 0.001)
-    return G
 
 def CodBinary(xdec: float, xmin: float, l: int, d: float) -> np.array:
     """
@@ -39,6 +22,7 @@ def CodBinary(xdec: float, xmin: float, l: int, d: float) -> np.array:
     return np.array(digits + [0 for _ in range(l - len(digits))])
 
 
+
 def CodDecimal(xbin: np.array, xmin: float, d: float):
     """
     :param x_bin: bin num to decode as np.array of digits
@@ -49,18 +33,53 @@ def CodDecimal(xbin: np.array, xmin: float, d: float):
     xdec1 = reduce(lambda _1, _2: _1 * 2 + _2, map(int, xbin[::-1]))
     return xmin + d * xdec1
     
-def BinDecParam(Xmin, Xmax, eps):
-    dim = len(Xmin)
-    NN.append(0)
-    for i in range(dim):
-        nn.append( int(math.log2((Xmax[i] - Xmin[i]) / eps) ) + 1 )
-        dd.append( (Xmax[i] - Xmin[i]) / 2**nn[i] )
-        NN.append( sum(nn) ) # NN[i] is l for CodBinary
-    print("nn-------------->: ", nn)
-    print("dd-------------->: ", dd)
-    print("NN-------------->: ", NN)
-    b = CodBinary(1.5, 0, 1, 3)
-    CodDecimal(b, 0, 3)
+def a_cod_binary(g_dec: np.matrix, x_min: np.array, nn: np.array, 
+                 dd: np.array) -> np.matrix:
+    """
+    :param g_dec: dec nums matrix to encode
+    :param x_min: min nums possible to encode
+    :param nn: num bin digits to encode nums
+    :param dd: discretionaries of encodings
+    :return: encoded nums as np.matrix of np.arrays of digits
+    """
+    assert g_dec.ndim == 2, f"g_dec should be a matrix (have dimension 2). " + \
+                            f"got g_dec.ndim = {g_dec.ndim}, g_dec = {g_dec}"
+    assert x_min.ndim == 1, "x_min should be an array (have dimension 1)"
+    assert nn.ndim == 1, "nn should be an array (have dimension 1)"
+    assert dd.ndim == 1, "dd should be an array (have dimension 1)"
+    assert g_dec.shape[1] == x_min.shape[0], "g_dec and x_min shapes mismatch"
+    assert g_dec.shape[1] == nn.shape[0], "g_dec and nn shapes mismatch"
+    assert g_dec.shape[1] == dd.shape[0], "g_dec and dd shapes mismatch"
+    n, m = g_dec.shape
+
+    return __a_cod_binary(n, m, g_dec, x_min, nn, dd)
+
+
+
+def __a_cod_binary(n: int, m: int, g_dec: np.matrix, x_min: np.array,
+                   nn: np.array, dd: np.array) -> np.matrix:
+    """
+    :param n: num rows in g_dec
+    :param m: num cols in g_dec
+    :param g_dec: dec nums matrix to encode
+    :param x_min: min nums possible to encode
+    :param nn: num bin digits to encode nums
+    :param dd: discretionaries of encodings
+    :return: encoded nums as np.matrix of np.arrays of digits
+    """
+    assert x_min.shape == (m, ), "x_min should be of shape (m, )"
+    assert nn.shape == (m, ), "nn should be of shape (m, )"
+    assert dd.shape == (m, ), "dd should be of shape (m, )"
+    assert g_dec.shape == (n, m), "g_dec should be of shape (n, m)"
+
+    return np.matrix([
+        np.hstack([
+            CodBinary(g_dec[i, j], x_min[j], nn[j], dd[j]) for j in range(m)
+        ]) for i in range(n)
+    ])
+
+
+
 
 def Parens(N: int):
     random.seed(1234)
@@ -77,10 +96,14 @@ def Adapt(periodic: list, N: int):
 
 
 if __name__ == "__main__":
-    # N = int(input("\033[1;33mPlease, enter N(rows):\033[0;0m "))
-    # M = int(input("\033[1;33mPlease, enter M(columns):\033[0;0m "))
-    # G = generationDec(N, M)
-    N = 10
+    N = int(input("\033[1;33mPlease, enter N(rows):\033[0;0m "))
+    M = int(input("\033[1;33mPlease, enter M(columns):\033[0;0m "))
+
     mlist, flist = Parens(N)
+    g_dec = np.matrix([[1.1, 2.31], [1.3, 2.7]])
+    x_min = np.array([1, 2])
+    nn = np.array([3, 4])
+    dd = np.array([.1, .1])
+    print( a_cod_binary(g_dec, x_min, nn, dd))
 
 
