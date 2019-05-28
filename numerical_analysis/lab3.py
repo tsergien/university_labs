@@ -32,7 +32,7 @@ def p(x: float, u: float, y: float, z: float):
 def r(value: float):
         return "{0:.2f}".format(value)
 
-h = 0.1
+h = 0.001
 x0 = 0
 u_0 = 1 + d
 y_0 = a+c # y = u' = f
@@ -40,9 +40,9 @@ z_0 = a*a + 2*b # z = u'' = g
 
 values = []
 print(f'l/h = {l/h}')
-x_m = np.linspace(0, l+h, l/h+1)
+x_m = np.linspace(0, l+h, l/h)
 
-print("\tx\t\tu\t\ty\t\tz")
+print("\tx_i\t\tu(x_i)\t\tdelta(u)")
 while x0 < l:
         k1 = h * f(x0, u_0, y_0, z_0) # z
         q1 = h * g(x0, u_0, y_0, z_0) # y
@@ -63,22 +63,21 @@ while x0 < l:
         z_1 = z_0 + (k1 + 2.0*k2 + 2.0*k3 + k4)/6.0
         y_1 = y_0 + (q1 + 2.0*q2 + 2.0*q3 + q4)/6.0
         u_1 = u_0 + (s1 + 2.0*s2 + 2.0*s3 + s4)/6.0
-        print(f'\t {r(x0 + h)}\t\t{r(u_1)}\t\t{r(y_1)}\t\t{r(z_1)}')
+        print(f'\t {r(x0)}\t\t{r(u_0)}\t\t{accurate_solution(x0) - u_0}')
+        values.append(u_0)
         u_0 = u_1
         y_0 = y_1
         z_0 = z_1
-        values.append(u_1)
         x0 += h
-
 
 x = np.linspace(0, l, 100)
 plt.plot(x, accurate_solution(x), 'k-', label='True function')
-plt.plot(x_m, values, 'k-', label='True function')
+plt.plot(x_m, values, 'b-', label='Runge-Kutta')
+plt.plot(x_m, values - accurate_solution(x_m), 'r.', label='Error')
 plt.xlabel('x')
-plt.ylabel('y')
-plt.title("Solutions")
+plt.ylabel('u')
+plt.title(f'Solutions (h = {h})')
 plt.legend()
 plt.grid(True)
 plt.show()
         
-
