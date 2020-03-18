@@ -1,6 +1,9 @@
 {
     "python.linting.pylintEnabled": true,
     "files.associations": {
-        "fstream": "cpp"
+        "fstream": "cpp",
+        "iostream": "cpp",
+        "ostream": "cpp",
+        "vector": "cpp"
     }
 }

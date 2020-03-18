@@ -67,19 +67,20 @@ public class Main {
                 new PatternWithColor(
                         "(?<!\\w)(abstract|assert|boolean|break|byte|case|catch|char|class|const|default|"+
                         "do|double|else|enum|extends|false|final|finally|float|for|goto|" + 
-                        "if|implements|import|instanceof|int|interface|long|native|new|null|package|"+
-                        "private|protected|public|return|short|static|strictfp|super|switch|synchronized|"+
+                        "if|implements|import|instanceof|int|interface|long|native|new|null|package|" +
+                        "private|protected|public|return|short|static|strictfp|super|switch|synchronized|" +
                         "this|throw|throws|transient|true|try|void|volatile|while|continue)(?!\\w)", "#e62569"),
 
+                // operations //
+                new PatternWithColor(
+                        "[+|-|%|/|*|=]", "#e62569"),
+
                 // typenames //
-                new PatternWithColor("(?<!\\w)(String|byte|boolean|auto|char|class|double|struct|enum|typedef|template|" +
-                        "int|union|wchar_t|long|unsigned|signed|void|int)(?!\\w)",
+                new PatternWithColor("(?<!\\w)(Integer|Boolean|Character|Byte|Short|Long|Float|Double|"+
+                        "String|byte|boolean|auto|char|class|double|enum|" +
+                        "int|long|unsigned|signed|void|int)(?!\\w)",
                         "#67d8ef;font-style:italic"),
 
-
-                // type definition //
-                new PatternWithColor("(?<=typedef.{1,100}\\s{1,10})([A-Za-z_][A-Za-z_0-9]*)(?>\\;)",
-                        "#a6e22d"),
 
                 // bool //
                 new PatternWithColor("(?<!\\w)(false|true)(?!\\w)", "#ac80ff"),
@@ -90,8 +91,11 @@ public class Main {
                 // BIN //
                 new PatternWithColor("0b[01]*", "#ac80ff"),
 
-                // int + float scientific //
+                // // int + float scientific //
                 new PatternWithColor("[0-9]*[.]?[0-9]+([eE][-+]?[0-9]+)", "#ac80ff"),
+
+                //  int + float scientific //
+                //  new PatternWithColor("[0-9]+", "#ac80ff"),
 
                 // function definition //
                 new PatternWithColor("(?<!\\w)(main)(?=\\()", "#a6e22c"),
@@ -132,7 +136,11 @@ public class Main {
         for (int i = 0; i < source.length(); ++i)
             coloredText[i] = null;
 
-        PatternWithColor[] patterns = getPatterns();
+        PatternWithColor[] patterns = getPatterns(); 
+        for (PatternWithColor p: patterns) {
+            System.out.println(p.color);
+            System.out.println(p.pattern);
+        }
 
         for (PatternWithColor pattern : patterns) {
             Matcher m = pattern.pattern.matcher(source);
@@ -149,6 +157,8 @@ public class Main {
                         coloredText[i] = pattern.color;
             }
         }
+        // for (int i = 0; i < source.length(); ++i)
+        //     System.out.println(coloredText);
 
         return coloredText;
     }
@@ -178,8 +188,8 @@ public class Main {
                         "</style>\n" +
                         "<body bgcolor=\"#282923\">\n" +
                         "\n"
-        );
-
+                        );
+                        
         for (int i = 0; i < source.length(); i++)
             builder.append(String.format("<span style='color:%s;'>%c</span>", colors[i], source.charAt(i)));
 
@@ -192,7 +202,7 @@ public class Main {
     }
 
     public static void main(String[] args) {
-        for (String s : Arrays.asList("Main", "Example")) {
+        for (String s : Arrays.asList("Example", "Main", "Test")) {
 
             String source = getFileContent(s + ".java");
 

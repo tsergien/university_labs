@@ -3,7 +3,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-l: float = 1
+l: float = 2
 a = 2
 b = -2
 c = 3
@@ -32,7 +32,7 @@ def p(x: float, u: float, y: float, z: float):
 def r(value: float):
         return "{0:.2f}".format(value)
 
-h = 0.001
+h = 0.01
 x0 = 0
 u_0 = 1 + d
 y_0 = a+c # y = u' = f
@@ -81,3 +81,4 @@ plt.legend()
 plt.grid(True)
 plt.show()
         
+
